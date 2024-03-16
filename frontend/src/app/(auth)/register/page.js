@@ -6,11 +6,13 @@ import { useAuth } from '@/hooks/auth'
 import { useValidate } from '@/hooks/validate'
 
 export default function Register () {
+  // Register a new user
   const { register } = useAuth({
     middleware: 'guest',
     redirectIfAuthenticated: '/'
   })
 
+  // Form fields
   const fields = {
     name: '',
     email: '',
@@ -18,6 +20,7 @@ export default function Register () {
     password_confirmation: ''
   }
 
+  // Form validation schema
   const schema = Yup.object().shape({
     name: Yup.string().required('This field is required'),
     email: Yup.string().email('Invalid email format').required('This field is required'),
@@ -31,13 +34,23 @@ export default function Register () {
   const [error, setError] = useState({})
   const { validate } = useValidate()
 
-  const onChange = async (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-    setError((prev) => ({ ...prev, [e.target.name]: [] }))
+  /**
+   * Handle form input change
+   *
+   * @param {*} event
+   */
+  const onChange = (event) => {
+    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }))
+    setError((prev) => ({ ...prev, [event.target.name]: [] }))
   }
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
+  /**
+   * Handle form submission
+   *
+   * @param {*} event
+   */
+  const onSubmit = async (event) => {
+    event.preventDefault()
 
     if (await validate({ ...form, setError, schema })) {
       register({ ...form, setError })

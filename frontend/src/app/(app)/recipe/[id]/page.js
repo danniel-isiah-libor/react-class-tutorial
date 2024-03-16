@@ -1,25 +1,33 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/auth'
 import { useRecipe } from '@/hooks/api/recipe'
-import { useRouter } from 'next/navigation'
+import Loading from '@/components/Loading'
+
+RecipeShow.propTypes = {
+  params: PropTypes.object.isRequired
+}
 
 export default function RecipeShow ({ params }) {
+  // Get the authenticated user
   const { user } = useAuth({ middleware: 'auth' })
   const [recipe, setRecipe] = useState({})
-  const { show, destroy } = useRecipe()
+  const { loading, show, destroy } = useRecipe()
   const router = useRouter()
 
   useEffect(() => {
     show(params.id).then((data) => setRecipe(data))
   }, [])
 
-  const onDelete = async () => {
-    await destroy(params.id).then(() => router.push('/'))
+  // Delete a recipe
+  const onDelete = () => {
+    destroy(params.id).then(() => router.push('/'))
   }
 
-  if (!user) return (<></>)
+  if (loading) return (<Loading/>)
 
   return (
     <div>
@@ -31,13 +39,13 @@ export default function RecipeShow ({ params }) {
         <dl className="divide-y divide-gray-100">
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-gray-900">Ingredients</dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0" style={{ whiteSpace: "pre-line" }}>
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0" style={{ whiteSpace: 'pre-line' }}>
               {recipe?.ingredients}
             </dd>
           </div>
           <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-gray-900">Instructions</dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0" style={{ whiteSpace: "pre-line" }}>
+            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0" style={{ whiteSpace: 'pre-line' }}>
               {recipe?.instructions}
             </dd>
           </div>

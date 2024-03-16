@@ -1,48 +1,54 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useAuth } from '@/hooks/auth'
-import { useValidate } from '@/hooks/validate'
 import * as Yup from 'yup'
-import { useRecipe } from '@/hooks/api/recipe'
 import { useRouter } from 'next/navigation'
+import { useValidate } from '@/hooks/validate'
+import { useRecipe } from '@/hooks/api/recipe'
 
 export default function RecipeCreate () {
+  // Form fields
   const fields = {
     title: '',
     ingredients: '',
     instructions: ''
   }
 
+  // Form validation schema
   const schema = Yup.object().shape({
     title: Yup.string().required('This is a required field'),
     ingredients: Yup.string().required('This is a required field'),
     instructions: Yup.string().required('This is a required field')
   })
 
-  const { user } = useAuth({ middleware: 'auth' })
   const [form, setForm] = useState(fields)
   const [error, setError] = useState({})
   const { validate } = useValidate()
   const { store, loading } = useRecipe({ setError })
   const router = useRouter()
 
-  const onChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-    setError((prev) => ({ ...prev, [e.target.name]: [] }))
+  /**
+   * Handle form input change
+   *
+   * @param {*} event
+   */
+  const onChange = (event) => {
+    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }))
+    setError((prev) => ({ ...prev, [event.target.name]: [] }))
   }
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
+  /**
+   * Handle form submission
+   *
+   * @param {*} event
+   */
+  const onSubmit = async (event) => {
+    event.preventDefault()
 
     if (await validate({ ...form, setError, schema })) {
-      await store(form).then(() => router.push('/'))
+      store(form).then(() => router.push('/'))
     }
   }
-
-  if (!user) return (<></>)
-
-  if (loading) return (<div>loading</div>)
 
   return (
     <form onSubmit={onSubmit}>
@@ -55,6 +61,7 @@ export default function RecipeCreate () {
               </label>
               <div className="mt-2">
                 <input
+                    disabled={loading}
                     onChange={onChange}
                     type="text"
                     name="title"
@@ -71,12 +78,13 @@ export default function RecipeCreate () {
               </label>
               <div className="mt-2">
                 <textarea
+                    disabled={loading}
                     onChange={onChange}
-                  id="ingredients"
-                  name="ingredients"
-                  rows={3}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={''}
+                    id="ingredients"
+                    name="ingredients"
+                    rows={3}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    defaultValue={''}
                 />
                 <small className="text-red-600">{error?.ingredients}</small>
               </div>
@@ -88,12 +96,13 @@ export default function RecipeCreate () {
               </label>
               <div className="mt-2">
                 <textarea
+                    disabled={loading}
                     onChange={onChange}
-                  id="instructions"
-                  name="instructions"
-                  rows={3}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={''}
+                    id="instructions"
+                    name="instructions"
+                    rows={3}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    defaultValue={''}
                 />
                 <small className="text-red-600">{error?.instructions}</small>
               </div>
@@ -103,10 +112,15 @@ export default function RecipeCreate () {
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button onClick={() => router.push('/')} className="text-sm font-semibold leading-6 text-gray-900">
+        <button
+          disabled={loading}
+          onClick={() => router.push('/')}
+          className="text-sm font-semibold leading-6 text-gray-900"
+        >
           Cancel
         </button>
         <button
+          disabled={loading}
           type="submit"
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >

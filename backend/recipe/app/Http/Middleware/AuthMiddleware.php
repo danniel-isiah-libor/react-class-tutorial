@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -24,13 +25,21 @@ class AuthMiddleware
             sprintf('%s/api/user', config('services.auth_url')),
             [
                 'http_errors' => false,
-                'headers' => $request->headers->all()
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'X-Requested-With' => 'XMLHttpRequest',
+                    'Authorization' => $request->headers->get('authorization') ?? '',
+                    'Cookie' => $request->headers->get('cookie') ?? '',
+                    'Origin' => $request->headers->get('origin') ?? '',
+                ]
             ]
         );
 
         switch ($response->getStatusCode()) {
             case 200:
                 $user = json_decode($response->getBody());
+
+                $user = User::find($user->id);
 
                 $request->setUserResolver(function () use ($user) {
                     return $user;

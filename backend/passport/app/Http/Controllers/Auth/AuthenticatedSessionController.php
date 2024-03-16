@@ -59,7 +59,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Refresh access token
+     * Refresh the token.
      */
     public function refreshToken(Request $request)
     {

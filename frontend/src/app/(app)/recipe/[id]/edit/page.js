@@ -1,50 +1,69 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
+import * as Yup from 'yup'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/auth'
 import { useValidate } from '@/hooks/validate'
-import * as Yup from 'yup'
 import { useRecipe } from '@/hooks/api/recipe'
-import { useRouter } from 'next/navigation'
 
-export default function RecipeEdit ({params}) {
+RecipeEdit.propTypes = {
+  params: PropTypes.object.isRequired
+}
+
+export default function RecipeEdit ({ params }) {
+  // Get the authenticated user
+  const { user } = useAuth({ middleware: 'auth' })
+
+  // Form fields
   const fields = {
     title: '',
     ingredients: '',
     instructions: ''
   }
 
+  // Form validation schema
   const schema = Yup.object().shape({
     title: Yup.string().required('This is a required field'),
     ingredients: Yup.string().required('This is a required field'),
     instructions: Yup.string().required('This is a required field')
   })
 
-  const { user } = useAuth({ middleware: 'auth' })
   const [form, setForm] = useState(fields)
   const [error, setError] = useState({})
   const { validate } = useValidate()
-  const { show, update, loading } = useRecipe({ setError })
+  const { loading, show, update } = useRecipe({ setError })
   const router = useRouter()
 
-  const onChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-    setError((prev) => ({ ...prev, [e.target.name]: [] }))
+  /**
+   * Handle form input change
+   *
+   * @param {*} event
+   */
+  const onChange = (event) => {
+    setForm((prev) => ({ ...prev, [event.target.name]: event.target.value }))
+    setError((prev) => ({ ...prev, [event.target.name]: [] }))
   }
 
-  const onSubmit = async (e) => {
-    e.preventDefault()
+  /**
+   * Handle form submission
+   *
+   * @param {*} event
+   */
+  const onSubmit = async (event) => {
+    event.preventDefault()
 
     if (await validate({ ...form, setError, schema })) {
-      await update(params.id, form).then(() => router.push(`/recipe/${params.id}`))
+      update(params.id, form).then(() => router.push(`/recipe/${params.id}`))
     }
   }
 
   useEffect(() => {
-    if(user) {
+    if (user) {
       show(params.id).then((data) => {
-        if(data.user_id !== user.id) router.push('/404')
-  
+        if (data.user_id !== user.id) router.push('/404')
+
         setForm({
           title: data.title,
           ingredients: data.ingredients,
@@ -53,10 +72,6 @@ export default function RecipeEdit ({params}) {
       })
     }
   }, [user])
-
-  if (!user) return (<></>)
-
-  if (loading) return (<div>loading</div>)
 
   return (
     <form onSubmit={onSubmit}>
@@ -69,6 +84,7 @@ export default function RecipeEdit ({params}) {
               </label>
               <div className="mt-2">
                 <input
+                    disabled={loading}
                     onChange={onChange}
                     value={form.title}
                     type="text"
@@ -86,6 +102,7 @@ export default function RecipeEdit ({params}) {
               </label>
               <div className="mt-2">
                 <textarea
+                    disabled={loading}
                     onChange={onChange}
                     id="ingredients"
                     name="ingredients"
@@ -103,6 +120,7 @@ export default function RecipeEdit ({params}) {
               </label>
               <div className="mt-2">
                 <textarea
+                    disabled={loading}
                     onChange={onChange}
                     id="instructions"
                     name="instructions"
@@ -118,10 +136,15 @@ export default function RecipeEdit ({params}) {
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button onClick={() => router.push(`/recipe/${params.id}`)} className="text-sm font-semibold leading-6 text-gray-900">
+        <button
+          disabled={loading}
+          onClick={() => router.push(`/recipe/${params.id}`)}
+          className="text-sm font-semibold leading-6 text-gray-900"
+        >
           Cancel
         </button>
         <button
+          disabled={loading}
           type="submit"
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >

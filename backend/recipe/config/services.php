@@ -31,6 +31,6 @@ return [
         ],
     ],
 
-    'auth_url' => env('AUTH_SERVICE_URL', 'https://localhost:8000')
+    'auth_url' => env('AUTH_SERVICE_URL', 'http://localhost:8000')
 
 ];

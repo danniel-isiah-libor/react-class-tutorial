@@ -1,4 +1,9 @@
-export const useValidate = () => {
+/**
+ * Validate form data
+ *
+ * @return {*}
+ */
+const useValidate = () => {
   const validate = async ({ schema, setError, ...props }) => {
     return schema.validate(props, { abortEarly: false })
       .then(() => true)
@@ -13,3 +18,5 @@ export const useValidate = () => {
     validate
   }
 }
+
+export { useValidate }

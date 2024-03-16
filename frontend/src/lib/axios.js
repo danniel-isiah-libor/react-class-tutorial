@@ -1,15 +1,27 @@
 import Axios from 'axios'
 import { getCookie } from 'cookies-next'
 
-const axios = (baseURL) => Axios.create({
-  baseURL,
-  headers: {
+/**
+ * Create a new Axios instance.
+ *
+ * @param {*} baseURL
+ */
+const axios = (baseURL) => {
+  const headers = {
     'X-Requested-With': 'XMLHttpRequest',
-    Accept: 'application/json',
-    Authorization: `Bearer ${JSON.parse(getCookie('token') ?? null)?.access_token}`
-  },
-  withCredentials: true,
-  withXSRFToken: true
-})
+    Accept: 'application/json'
+  }
+
+  const token = JSON.parse(getCookie('token') ?? null)?.access_token
+
+  if(token) headers.Authorization = `Bearer ${token}`
+
+  return Axios.create({
+    baseURL,
+    headers,
+    withCredentials: true,
+    withXSRFToken: true
+  })
+}
 
 export default axios

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { DateTime } from 'luxon'
 import Link from 'next/link'
+
 import { useRecipe } from '@/hooks/api/recipe'
 
 export default function Home () {
@@ -16,7 +17,8 @@ export default function Home () {
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-12">
       <ul role="list" className="divide-y divide-gray-100">
-        {(recipes.length) ? (recipes.map((recipe) => (
+        {(recipes.length)
+          ? (recipes.map((recipe) => (
           <li key={recipe?.id} className="flex justify-between gap-x-6 py-5">
             <Link href={`/recipe/${recipe?.id}`} className="w-full">
               <div className="flex min-w-0 gap-x-4">
@@ -32,7 +34,8 @@ export default function Home () {
               </div>
             </Link>
           </li>
-        ))) : null}
+            )))
+          : null}
       </ul>
     </div>
   )

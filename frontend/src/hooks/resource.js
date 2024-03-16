@@ -1,6 +1,17 @@
 import axios from '@/lib/axios'
 
-export const useResource = ({ setError, setLoading, baseURL, route }) => {
+/**
+ * Create a new resource.
+ *
+ * @param {*} { setError, setLoading, baseURL, route }
+ * @return {*}
+ */
+const useResource = ({ setError, setLoading, baseURL, route }) => {
+  /**
+   * Fetch all records from the resource.
+   *
+   * @return {*}
+   */
   const index = () => {
     setLoading(true)
 
@@ -10,6 +21,12 @@ export const useResource = ({ setError, setLoading, baseURL, route }) => {
       .finally(() => setLoading(false))
   }
 
+  /**
+   * Fetch a single record from the resource.
+   *
+   * @param {*} id
+   * @return {*}
+   */
   const show = (id) => {
     setLoading(true)
 
@@ -19,6 +36,12 @@ export const useResource = ({ setError, setLoading, baseURL, route }) => {
       .finally(() => setLoading(false))
   }
 
+  /**
+   * Store a new record in the resource.
+   *
+   * @param {*} payload
+   * @return {*}
+   */
   const store = (payload) => {
     setLoading(true)
 
@@ -32,6 +55,13 @@ export const useResource = ({ setError, setLoading, baseURL, route }) => {
       .finally(() => setLoading(false))
   }
 
+  /**
+   * Update a record in the resource.
+   *
+   * @param {*} id
+   * @param {*} payload
+   * @return {*}
+   */
   const update = (id, payload) => {
     setLoading(true)
 
@@ -45,6 +75,12 @@ export const useResource = ({ setError, setLoading, baseURL, route }) => {
       .finally(() => setLoading(false))
   }
 
+  /**
+   * Delete a record from the resource.
+   *
+   * @param {*} id
+   * @return {*}
+   */
   const destroy = (id) => {
     setLoading(true)
 
@@ -62,3 +98,5 @@ export const useResource = ({ setError, setLoading, baseURL, route }) => {
     destroy
   }
 }
+
+export { useResource }

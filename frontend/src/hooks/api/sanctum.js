@@ -1,12 +1,21 @@
-import useSWR from 'swr'
 import axios from '@/lib/axios'
-import { useEffect } from 'react'
+import useSWR from 'swr'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
-export const useSanctum = ({ middleware, redirectIfAuthenticated } = {}) => {
+/**
+ * Use Sanctum authentication.
+ *
+ * @param {*} [{ middleware, redirectIfAuthenticated }={}]
+ * @return {*}
+ */
+const useSanctum = ({ middleware, redirectIfAuthenticated } = {}) => {
   const router = useRouter()
   const baseURL = process.env.AUTH_SERVICE_URL
 
+  /**
+   * Fetch the user from the server.
+   */
   const { data: user, error, mutate } = useSWR('/api/user', () =>
     axios(baseURL)
       .get('/api/user')
@@ -18,8 +27,16 @@ export const useSanctum = ({ middleware, redirectIfAuthenticated } = {}) => {
       })
   )
 
+  /**
+   * Fetch the CSRF token.
+   */
   const csrf = () => axios(baseURL).get('/sanctum/csrf-cookie')
 
+  /**
+   * Register a new user.
+   *
+   * @param {*} { setError, ...props }
+   */
   const register = async ({ setError, ...props }) => {
     await csrf()
 
@@ -35,6 +52,11 @@ export const useSanctum = ({ middleware, redirectIfAuthenticated } = {}) => {
       })
   }
 
+  /**
+   * Log the user in.
+   *
+   * @param {*} { setError, ...props }
+   */
   const login = async ({ setError, ...props }) => {
     await csrf()
 
@@ -50,6 +72,11 @@ export const useSanctum = ({ middleware, redirectIfAuthenticated } = {}) => {
       })
   }
 
+  /**
+   * Send a password reset email.
+   *
+   * @param {*} { setError, email }
+   */
   const forgotPassword = async ({ setError, email }) => {
     await csrf()
 
@@ -65,6 +92,11 @@ export const useSanctum = ({ middleware, redirectIfAuthenticated } = {}) => {
       })
   }
 
+  /**
+   * Reset the user's password.
+   *
+   * @param {*} { setError, ...props }
+   */
   const resetPassword = async ({ setError, ...props }) => {
     await csrf()
 
@@ -80,12 +112,18 @@ export const useSanctum = ({ middleware, redirectIfAuthenticated } = {}) => {
       })
   }
 
+  /**
+   * Resend the email verification.
+   */
   const resendEmailVerification = () => {
     axios(baseURL)
       .post('/email/verification-notification')
       .then(() => true)
   }
 
+  /**
+   * Log the user out.
+   */
   const logout = async () => {
     if (!error) {
       await axios(baseURL).post('/logout')
@@ -111,3 +149,5 @@ export const useSanctum = ({ middleware, redirectIfAuthenticated } = {}) => {
     logout
   }
 }
+
+export { useSanctum }
